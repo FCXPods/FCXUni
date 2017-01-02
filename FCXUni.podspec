@@ -28,5 +28,7 @@ Pod::Spec.new do |s|
 
   s.source_files  = "FCXCategory/*.{h,m}", "FCXConfig/*.{h,m}", "FCXFoundation/*.{h,m}", "FCXUIKit/*.{h,m}"
 
+  s.dependency "UMengAnalytics", "~> 4.1.8"
+  s.dependency "UMengFeedback", "~> 2.3.4"
 
 end
