@@ -10,7 +10,7 @@
 #import "FCXGuide.h"
 #import "UMFeedback.h"
 #import "FCXOnlineConfig.h"
-#import "MobClick.h"
+#import <UMMobClick/MobClick.h>
 
 #define HASRATING @"HasRating"
 

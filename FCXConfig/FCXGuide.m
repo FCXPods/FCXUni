@@ -8,7 +8,7 @@
 
 #import "FCXGuide.h"
 #import "FCXOnlineConfig.h"
-#import "MobClick.h"
+#import <UMMobClick/MobClick.h>
 
 @implementation MAlertViw
 
