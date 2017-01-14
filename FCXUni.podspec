@@ -30,5 +30,9 @@ Pod::Spec.new do |s|
   s.resources = "FCXShare/ShareIcon/*.png"
   s.dependency "UMengAnalytics", "~> 4.1.8"
   s.dependency "UMengFeedback", "~> 2.3.4"
+  s.dependency "UMengUShare/Social/Sina", "~> 6.2.1"
+  s.dependency "UMengUShare/Social/WeChat", "~> 6.2.1"
+  s.dependency "UMengUShare/Social/QQ", "~> 6.2.1"
+  s.dependency "UMengUShare/Social/SMS", "~> 6.2.1"
 
 end
