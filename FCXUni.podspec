@@ -26,8 +26,8 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/FCXPods/FCXUni.git", :tag => "0.0.1" }
 
 
-  s.source_files  = "FCXCategory/*.{h,m}", "FCXConfig/*.{h,m}", "FCXFoundation/*.{h,m}", "FCXUIKit/*.{h,m}"
-
+  s.source_files  = "FCXCategory/*.{h,m}", "FCXConfig/*.{h,m}", "FCXFoundation/*.{h,m}", "FCXUIKit/*.{h,m}", "FCXShare/*.{h,m}"
+  s.resources = "FCXShare/ShareIcon/*.png"
   s.dependency "UMengAnalytics", "~> 4.1.8"
   s.dependency "UMengFeedback", "~> 2.3.4"
 
