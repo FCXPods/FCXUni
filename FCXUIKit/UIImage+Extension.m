@@ -223,8 +223,6 @@ static inline CGFloat DegreesToRadians(CGFloat degrees)
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return newImage;
-    
-    
 }
 
 
