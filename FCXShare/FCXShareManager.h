@@ -22,7 +22,9 @@ typedef NS_ENUM(NSInteger, FCXSharePlatform) {
     FCXSharePlatformQQ,                //!<QQ
     FCXSharePlatformQzone,             //!<QQ空间
     FCXSharePlatformSina,              //!<新浪微博
-    FCXSharePlatformSms                //!<短信
+    FCXSharePlatformSms,               //!<短信
+    FCXSharePlatformCollection,        //!<收藏
+    FCXSharePlatformCopy,              //!<复制
 };
 
 @interface FCXShareManager : UIView
