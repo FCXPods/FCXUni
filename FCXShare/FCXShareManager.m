@@ -695,8 +695,11 @@ UIImage *ImageWithColor(UIColor *color) {
 }
 
 - (void)setCollection:(BOOL)collection {
-    FCXShareButton *button = (UIButton *)[_bottomView viewWithTag:FCXSharePlatformCollection];
-    button.selected = collection;
+    if (_collection != collection) {
+        _collection = collection;
+        FCXShareButton *button = (UIButton *)[_bottomView viewWithTag:FCXSharePlatformCollection];
+        button.selected = collection;
+    }
 }
 
 @end
