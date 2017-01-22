@@ -51,9 +51,15 @@ typedef NS_ENUM(NSInteger, FCXSharePlatform) {
 @property (nonatomic, unsafe_unretained) FCXShareType shareType;
 
 @property (nonatomic, copy) dispatch_block_t shareSuccessBlock;
+@property (nonatomic, copy) dispatch_block_t collectionBlock;
+@property (nonatomic, copy) dispatch_block_t copyBlock;
+@property (nonatomic, unsafe_unretained) BOOL collection;//!<是否收藏
 
 
-+ (FCXShareManager *)sharedManager;
+//竖直方向的分享界面
++ (FCXShareManager *)verManager;
+//水平滚动的分享界面
++ (FCXShareManager *)horManager;
 
 - (void)showShareView;
 - (void)showInviteFriendsShareView;//!<邀请好友显示的分享

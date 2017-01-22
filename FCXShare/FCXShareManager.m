@@ -15,8 +15,6 @@
 
 #define SHARE_UICOLOR_FROMRGB(rgbValue) [UIColor colorWithRed:((float)(((rgbValue) & 0xFF0000) >> 16))/255.0 green:((float)(((rgbValue) & 0xFF00) >> 8))/255.0 blue:((float)((rgbValue) & 0xFF))/255.0 alpha:1.0]
 
-#define SHARE_TITLE_NORMALCOLOR SHARE_UICOLOR_FROMRGB(0x333333)
-#define SHARE_TITLE_HCOLOR SHARE_UICOLOR_FROMRGB(0x999999)
 
 static inline CGFloat Share_ScreenWidth() {
     return [UIScreen mainScreen].bounds.size.width;
@@ -45,7 +43,8 @@ UIImage *ImageWithColor(UIColor *color) {
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
+    self.imageView.frame = CGRectMake((self.frame.size.width - self.imageView.frame.size.width)/2.0, 0, self.imageView.frame.size.width, self.imageView.frame.size.height);
+    self.titleLabel.frame = CGRectMake(0, self.imageView.frame.size.height + 8, self.frame.size.width, self.titleLabel.frame.size.height);
 }
 
 @end
@@ -55,47 +54,85 @@ UIImage *ImageWithColor(UIColor *color) {
     UIView *_bottomView;
     CGFloat _bottomHeight;
     UIButton *_cancelButton;
+    UIColor *_titleNormalColor;
+    UIColor *_titleHighLightedColor;
+    UIColor *_titleSelectedColor;
+    UIScrollView *_scrollView;
+    UIView *_midLine;
 }
+
+@property (nonatomic, unsafe_unretained) NSInteger managerType;//0竖直方向 1水平方向
+
 
 @end
 
 @implementation FCXShareManager
 
-+ (FCXShareManager *)sharedManager {
++ (FCXShareManager *)verManager {
+    return [FCXShareManager sharedManager:0];
+}
+
++ (FCXShareManager *)horManager {
+    return [FCXShareManager sharedManager:1];
+}
+
++ (FCXShareManager *)sharedManager:(int)managerType {
     static FCXShareManager *shareManager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        shareManager = [[FCXShareManager alloc] init];
+        shareManager = [[FCXShareManager alloc] initWithType:managerType];
     });
+    shareManager.managerType = managerType;
     return shareManager;
 }
 
-- (id)init {
+- (void)setManagerType:(NSInteger)managerType {
+    if (_managerType != managerType) {
+        _managerType = managerType;
+        _midLine.hidden = managerType == 0;
+    }
+}
+
+- (id)initWithType:(int)type {
     if (self = [super init]) {
         self.frame = CGRectMake(0, 0, Share_ScreenWidth(), Share_ScreenHeight());
         self.userInteractionEnabled = YES;
         self.backgroundColor = [UIColor colorWithWhite:0 alpha:.6];
-        
+        _managerType = type;
+        _titleNormalColor = SHARE_UICOLOR_FROMRGB(0x333333);
+        _titleHighLightedColor = SHARE_UICOLOR_FROMRGB(0x999999);
+        _titleSelectedColor = SHARE_UICOLOR_FROMRGB(0x9c1421);
+
         [self judgeBottomHeight];
         
         _bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, Share_ScreenHeight(), Share_ScreenWidth(), _bottomHeight)];
-        _bottomView.backgroundColor = SHARE_UICOLOR_FROMRGB(0xffffff);
+        _bottomView.backgroundColor = SHARE_UICOLOR_FROMRGB(0xfce5af);
         [self addSubview:_bottomView];
+        
+        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 25 + 85 + 18)];
+        _scrollView.userInteractionEnabled = YES;
+        _scrollView.showsHorizontalScrollIndicator = NO;
+        [_bottomView addSubview:_scrollView];
         
         [self createShareButtons];
         
-        _cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_cancelButton setBackgroundImage:ImageWithColor([UIColor whiteColor]) forState:UIControlStateNormal];
-        [_cancelButton setBackgroundImage:ImageWithColor(SHARE_UICOLOR_FROMRGB(0xebebeb)) forState:UIControlStateHighlighted];
+        _midLine = [[UIView alloc] initWithFrame:CGRectMake(15 , 25 + 85 + 25, Share_ScreenWidth() - 30, .5)];
+        _midLine.backgroundColor = SHARE_UICOLOR_FROMRGB(0xe2cb93);
+        _midLine.hidden = _managerType == 0;
+        [_bottomView addSubview:_midLine];
+
+            _cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_cancelButton setBackgroundImage:ImageWithColor(SHARE_UICOLOR_FROMRGB(0xfff0cc)) forState:UIControlStateNormal];
+        [_cancelButton setBackgroundImage:ImageWithColor(SHARE_UICOLOR_FROMRGB(0xfff5dd)) forState:UIControlStateHighlighted];
         [_cancelButton setTitle:@"取消" forState:UIControlStateNormal];
-        [_cancelButton setTitleColor:SHARE_TITLE_NORMALCOLOR forState:UIControlStateNormal];
-        [_cancelButton setTitleColor:SHARE_TITLE_HCOLOR forState:UIControlStateHighlighted];
+        [_cancelButton setTitleColor:_titleNormalColor forState:UIControlStateNormal];
+        [_cancelButton setTitleColor:_titleHighLightedColor forState:UIControlStateHighlighted];
         [_cancelButton addTarget:self action:@selector(tapAction) forControlEvents:UIControlEventTouchUpInside];
         _cancelButton.frame = CGRectMake(0, _bottomHeight - 44, Share_ScreenWidth(), 44);
         [_bottomView addSubview:_cancelButton];
         
         UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0, 0, Share_ScreenWidth(), .5)];
-        line.backgroundColor = SHARE_UICOLOR_FROMRGB(0xe0e0e0);
+        line.backgroundColor = SHARE_UICOLOR_FROMRGB(0xe2cb93);
         [_cancelButton addSubview:line];
         
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction)];
@@ -106,11 +143,29 @@ UIImage *ImageWithColor(UIColor *color) {
 
 //根据第三方平台是否安装情况判断显示高度
 - (void)judgeBottomHeight {
-    if ([WXApi isWXAppInstalled] && [QQApiInterface isQQInstalled]){
-        _bottomHeight = 265;
-    }else{
-        _bottomHeight = 265 - 80;
+    if (_managerType == 1) {
+        _bottomHeight = 25 + 85 + 25 + 18 + 85 + 25 + 44;
+        int count = 2;
+        if ([WXApi isWXAppInstalled]) {
+            count += 2;
+        }
+        if ([QQApiInterface isQQInstalled]) {
+            count += 2;
+        }
+        _scrollView.frame = CGRectMake(0, 0, Share_ScreenWidth(), 25 + 85 + 25);
+        _scrollView.contentSize = CGSizeMake(25 + count * (20 + 60) - 20 + 25, _scrollView.frame.size.height);
+        return;
     }
+    
+    if ([WXApi isWXAppInstalled] && [QQApiInterface isQQInstalled]){
+//        _bottomHeight = 265;
+        _bottomHeight = 25 + 85 * 2 + 15 + 25 + 44;
+    }else{
+//        _bottomHeight = 265 - 80;
+        _bottomHeight = 25 + 85 + 25 + 44;
+    }
+    _scrollView.frame = CGRectMake(0, 0, Share_ScreenWidth(), _bottomHeight - 44);
+    _scrollView.contentSize = _scrollView.frame.size;
 }
 
 #pragma mark - 创建所有的分享按钮（每次show的时候都需要调用，因为本地的第三方软件随时可能发生变化，删除或者下载）
@@ -118,14 +173,22 @@ UIImage *ImageWithColor(UIColor *color) {
     int i = 0;
     CGFloat buttonWidth = 65;
     CGFloat buttonHeight = 85;
-//    CGFloat top = (_bottomHeight - 44 - buttonHeight)/2.0;
-    CGFloat top = 10;
-
+    CGFloat top = 25;
     CGFloat space = (Share_ScreenWidth() - buttonWidth * 4)/5.0;
 
+    if (_managerType == 1) {
+        buttonWidth = 60;
+        space = 20;
+    }
+
     for (int j = 0; j < 7; j++) {
-        CGRect buttonFrame = CGRectMake(space + (i%4) * (buttonWidth + space), top + (i/4) * (buttonHeight + 5), buttonWidth, buttonHeight);
-        UIButton *shareButton;
+        CGRect buttonFrame;
+        if (_managerType == 0) {
+            buttonFrame = CGRectMake(space + (i%4) * (buttonWidth + space), top + (i/4) * (buttonHeight + 15), buttonWidth, buttonHeight);
+        } else {
+            buttonFrame = CGRectMake(25 + i * (buttonWidth + space), top, buttonWidth, buttonHeight);
+        }
+        FCXShareButton *shareButton;
         switch (j) {
             case 0:
             {//微信
@@ -135,7 +198,8 @@ UIImage *ImageWithColor(UIColor *color) {
                                                                tag:FCXSharePlatformWXSession
                                                              title:@"微信好友"
                                                        normalImage:@"share_wx"
-                                                  highlightedImage:@"share_wx_h"];
+                                                  highlightedImage:@"share_wx_h"
+                                                         superView:_scrollView];
                 }
             }
                 break;
@@ -147,7 +211,8 @@ UIImage *ImageWithColor(UIColor *color) {
                                                                tag:FCXSharePlatformWXTimeline
                                                              title:@"微信朋友圈"
                                                        normalImage:@"share_wxfc"
-                                                  highlightedImage:@"share_wxfc_h"];
+                                                  highlightedImage:@"share_wxfc_h"
+                                                         superView:_scrollView];
                 }
             }
                 break;
@@ -159,7 +224,8 @@ UIImage *ImageWithColor(UIColor *color) {
                                                                tag:FCXSharePlatformQQ
                                                              title:@"QQ"
                                                        normalImage:@"share_qq"
-                                                  highlightedImage:@"share_qq_h"];
+                                                  highlightedImage:@"share_qq_h"
+                                                         superView:_scrollView];
                 }
             }
                 break;
@@ -171,7 +237,8 @@ UIImage *ImageWithColor(UIColor *color) {
                                                                tag:FCXSharePlatformQzone
                                                              title:@"QQ空间"
                                                        normalImage:@"share_qqzone"
-                                                  highlightedImage:@"share_qqzone_h"];
+                                                  highlightedImage:@"share_qqzone_h"
+                                                         superView:_scrollView];
                 }
             }
                 break;
@@ -182,7 +249,8 @@ UIImage *ImageWithColor(UIColor *color) {
                                                            tag:FCXSharePlatformSina
                                                          title:@"新浪微博"
                                                    normalImage:@"share_sina"
-                                              highlightedImage:@"share_sina_h"];
+                                              highlightedImage:@"share_sina_h"
+                                                     superView:_scrollView];
             }
                 break;
                 
@@ -194,7 +262,8 @@ UIImage *ImageWithColor(UIColor *color) {
                                                                tag:FCXSharePlatformSms
                                                              title:@"短信"
                                                        normalImage:@"share_sms"
-                                                  highlightedImage:@"share_sms_h"];
+                                                  highlightedImage:@"share_sms_h"
+                                                         superView:_scrollView];
                 }
             }
                 break;
@@ -202,6 +271,8 @@ UIImage *ImageWithColor(UIColor *color) {
                 break;
         }
         
+        [_scrollView addSubview:shareButton];
+
         CGAffineTransform transform = CGAffineTransformMakeTranslation(0, 45);
         shareButton.transform = transform;
         shareButton.alpha = .3;
@@ -214,35 +285,77 @@ UIImage *ImageWithColor(UIColor *color) {
             
         }];
     }
+    
+    if (_managerType == 1) {
+        for (int j = 0; j < 2; j++) {
+            CGRect buttonFrame = CGRectMake(25 + j * (buttonWidth + space), 25 + 85 + 25 + 18, buttonWidth, buttonHeight);
+            FCXShareButton *shareButton;
+            if (j == 0) {
+                shareButton = [self createShareButtonWithFrame:buttonFrame
+                                                           tag:FCXSharePlatformCollection
+                                                         title:@"收藏"
+                                                   normalImage:@"share_collection"
+                                              highlightedImage:@"share_collection_h"
+                                                     superView:_bottomView];
+                shareButton.selected = _collection;
+                
+            } else if ( j == 1) {
+                shareButton = [self createShareButtonWithFrame:buttonFrame
+                                                           tag:FCXSharePlatformCopy
+                                                         title:@"复制"
+                                                   normalImage:@"share_copy"
+                                              highlightedImage:@"share_copy_h"superView:_bottomView];
+                
+            }
+            [_bottomView addSubview:shareButton];
+            
+            CGAffineTransform transform = CGAffineTransformMakeTranslation(0, 45);
+            shareButton.transform = transform;
+            shareButton.alpha = .3;
+            
+            [UIView animateWithDuration:1. delay:j%4 * 0.03 usingSpringWithDamping:.5 initialSpringVelocity:8 options:UIViewAnimationOptionCurveEaseOut animations:^{
+                shareButton.transform = CGAffineTransformIdentity;
+                shareButton.alpha = 1;
+                
+            } completion:^(BOOL finished) {
+                
+            }];
+        }
+    }
 }
 
-- (UIButton *)createShareButtonWithFrame:(CGRect)frame
-                                     tag:(int)tag
-                                   title:(NSString *)title
-                             normalImage:(NSString *)normalImage
-                        highlightedImage:(NSString *)highlightedImage {
-    UIButton *button = (UIButton *)[_bottomView viewWithTag:tag];
+- (FCXShareButton *)createShareButtonWithFrame:(CGRect)frame
+                                           tag:(int)tag
+                                         title:(NSString *)title
+                                   normalImage:(NSString *)normalImage
+                              highlightedImage:(NSString *)highlightedImage
+                                     superView:(UIView *)superView {
+    FCXShareButton *button = (UIButton *)[superView viewWithTag:tag];
     if ([button isKindOfClass:[UIButton class]]) {
         button.frame = frame;
         return button;
     }
-    button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button = [FCXShareButton buttonWithType:UIButtonTypeCustom];
     button.frame = frame;
     button.tag = tag;
     [button setTitle:title forState:UIControlStateNormal];
     [button setImage:[UIImage imageNamed:normalImage] forState:UIControlStateNormal];
-//    [button setImage:[UIImage imageNamed:highlightedImage] forState:UIControlStateHighlighted];
+    [button setImage:[UIImage imageNamed:highlightedImage] forState:UIControlStateHighlighted];
     [button addTarget:self action:@selector(shareButtonAction:) forControlEvents:UIControlEventTouchUpInside];
     button.titleEdgeInsets = UIEdgeInsetsMake(80, -65, 0, 0);
     if ([UIDevice currentDevice].systemVersion.floatValue < 7.0) {
         button.titleEdgeInsets = UIEdgeInsetsMake(80, -56, 0, 0);
     }
-    [button setTitleColor:SHARE_TITLE_NORMALCOLOR forState:UIControlStateNormal];
-    [button setTitleColor:SHARE_TITLE_HCOLOR forState:UIControlStateHighlighted];
+    [button setTitleColor:_titleNormalColor forState:UIControlStateNormal];
+    [button setTitleColor:_titleHighLightedColor forState:UIControlStateHighlighted];
+    if (tag == FCXSharePlatformCollection) {
+        [button setTitleColor:_titleSelectedColor forState:UIControlStateSelected];
+        [button setImage:[UIImage imageNamed:[normalImage stringByAppendingString:@"_s"]] forState:UIControlStateSelected];
+    }
     button.titleLabel.textAlignment = NSTextAlignmentCenter;
-    button.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:10];
+    button.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:11];
     button.exclusiveTouch = YES;
-    [_bottomView addSubview:button];
+    [superView addSubview:button];
     return button;
 }
 
@@ -253,13 +366,19 @@ UIImage *ImageWithColor(UIColor *color) {
 - (void)showShareView {
     //每次显示分享界面的时候，需要重新判断显示的分享平台
     for (UIButton *button in _bottomView.subviews) {
-        if ([button isKindOfClass:[UIButton class]]) {
+        if ([button isKindOfClass:[FCXShareButton class]]) {
             button.frame = CGRectZero;
         }
     }
+    for (UIButton *button in _scrollView.subviews) {
+        if ([button isKindOfClass:[FCXShareButton class]]) {
+            button.frame = CGRectZero;
+        }
+    }
+
     [self judgeBottomHeight];
     _bottomView.frame = CGRectMake(0, Share_ScreenHeight(), Share_ScreenWidth(), _bottomHeight);
-    _cancelButton.frame = CGRectMake(0, _bottomHeight - 50, Share_ScreenWidth(), 50);
+    _cancelButton.frame = CGRectMake(0, _bottomHeight - 44, Share_ScreenWidth(), 44);
     [self createShareButtons];
     UIWindow* window = [UIApplication sharedApplication].keyWindow;
     self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
@@ -413,6 +532,18 @@ UIImage *ImageWithColor(UIColor *color) {
 }
 
 - (void)shareToPlatform:(FCXSharePlatform)platform {
+    if (platform == FCXSharePlatformCollection) {
+        if (_collectionBlock) {
+            _collectionBlock();
+        }
+        return;
+    } else if (platform == FCXSharePlatformCopy) {
+        if (_copyBlock) {
+            _copyBlock();
+        }
+        return;
+    }
+
     if (_shareType == FCXShareTypeEmotion) {
         [self shareEmotion:platform];
         return;
@@ -561,6 +692,11 @@ UIImage *ImageWithColor(UIColor *color) {
         self.shareContent = [[self.shareContent substringToIndex:147] stringByAppendingString:@"..."];
     }
     return self.shareContent;
+}
+
+- (void)setCollection:(BOOL)collection {
+    FCXShareButton *button = (UIButton *)[_bottomView viewWithTag:FCXSharePlatformCollection];
+    button.selected = collection;
 }
 
 @end
