@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
 
   s.source_files  = "FCXCategory/*.{h,m}", "FCXConfig/*.{h,m}", "FCXFoundation/*.{h,m}", "FCXUIKit/*.{h,m}", "FCXShare/*.{h,m}"
   s.resources = "FCXShare/ShareIcon/*.png"
-  s.vendored_frameworks = "UMOnlineConfig/UMOnlineConfig.framework"
+  s.vendored_frameworks = "UMOnlineConfig/UMOnlineConfig.framework", "BCFeedback/AmrCodecFMWK.framework", "BCFeedback/UTDID.framework", "BCFeedback/UTMini.framework", "BCFeedback/WQConnectorBundle.framework", "BCFeedback/YWFeedbackFMWK.framework", "BCFeedback/YWHybridWebViewFMWK.framework"
 
   s.dependency "UMengAnalytics", "~> 4.1.8"
   s.dependency "UMengFeedback", "~> 2.3.4"
