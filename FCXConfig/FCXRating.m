@@ -102,9 +102,7 @@
     
     // 设置App自定义扩展反馈数据
     _feedbackKit.extInfo = @{@"loginTime":[[NSDate date] description],
-                                 @"visitPath":@"登陆->关于->反馈",
-                                 @"应用自定义扩展信息":@"开发者可以根据需要设置不同的自定义信息，方便在反馈系统中查看"};
-    _feedbackKit.customUIPlist = [NSDictionary dictionaryWithObjectsAndKeys:@"/te\'st\\Value1\"", @"testKey1", @"test<script>alert(\"error.yaochen\")</alert>Value2", @"testKey2", nil];
+                                 @"visitPath":@"好评->反馈"};
     
     __weak typeof(self) weakSelf = self;
 
