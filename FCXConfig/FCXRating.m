@@ -81,7 +81,7 @@
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 
-                [self goFeedbcak];
+                [self goFeedbcak:bcKey];
             });
             
         }else if(buttonIndex == 1) {
@@ -97,8 +97,8 @@
     return YES;
 }
 
-- (void)goFeedbcak {
-    _feedbackKit = [[YWFeedbackKit alloc] initWithAppKey:@"23605906"];
+- (void)goFeedbcak:(NSString *)bcKey {
+    _feedbackKit = [[YWFeedbackKit alloc] initWithAppKey:bcKey];
     
     // 设置App自定义扩展反馈数据
     _feedbackKit.extInfo = @{@"loginTime":[[NSDate date] description],
@@ -106,6 +106,8 @@
                                  @"应用自定义扩展信息":@"开发者可以根据需要设置不同的自定义信息，方便在反馈系统中查看"};
     _feedbackKit.customUIPlist = [NSDictionary dictionaryWithObjectsAndKeys:@"/te\'st\\Value1\"", @"testKey1", @"test<script>alert(\"error.yaochen\")</alert>Value2", @"testKey2", nil];
     
+    __weak typeof(self) weakSelf = self;
+
     [_feedbackKit makeFeedbackViewControllerWithCompletionBlock:^(YWFeedbackViewController *viewController, NSError *error) {
         if ( viewController != nil ) {
             viewController.title = @"意见反馈";
