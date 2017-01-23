@@ -10,14 +10,17 @@
 #import "FCXGuide.h"
 #import "UMFeedback.h"
 #import "FCXOnlineConfig.h"
-#import <UMMobClick/MobClick.h>
+#import <YWFeedbackFMWK/YWFeedbackKit.h>
 
 #define HASRATING @"HasRating"
 
 @implementation FCXRating
+{
+   YWFeedbackKit *_feedbackKit;
+}
 
-+ (BOOL)startRating:(NSString *)appID {
-    return [[FCXRating sharedRating] fcx_startRating:appID];
++ (BOOL)startRating:(NSString *)appID bcKey:(NSString *)bcKey {
+    return [[FCXRating sharedRating] fcx_startRating:appID bcKey:bcKey];
 }
 
 + (FCXRating *)sharedRating {
@@ -29,7 +32,7 @@
     return rating;
 }
 
-- (BOOL)fcx_startRating:(NSString *)appID {
+- (BOOL)fcx_startRating:(NSString *)appID bcKey:(NSString *)bcKey {
     
     BOOL showRating = [[FCXOnlineConfig fcxGetConfigParams:@"showRating" defaultValue:@"0"] boolValue];
     if (!showRating) {
@@ -94,6 +97,61 @@
     
     [self saveAlert];
     return YES;
+}
+
+- (void)goFeedbcak {
+    _feedbackKit = [[YWFeedbackKit alloc] initWithAppKey:@"23605906"];
+    
+    // 设置App自定义扩展反馈数据
+    _feedbackKit.extInfo = @{@"loginTime":[[NSDate date] description],
+                                 @"visitPath":@"登陆->关于->反馈",
+                                 @"应用自定义扩展信息":@"开发者可以根据需要设置不同的自定义信息，方便在反馈系统中查看"};
+    _feedbackKit.customUIPlist = [NSDictionary dictionaryWithObjectsAndKeys:@"/te\'st\\Value1\"", @"testKey1", @"test<script>alert(\"error.yaochen\")</alert>Value2", @"testKey2", nil];
+    
+    [_feedbackKit makeFeedbackViewControllerWithCompletionBlock:^(YWFeedbackViewController *viewController, NSError *error) {
+        if ( viewController != nil ) {
+            viewController.title = @"意见反馈";
+            
+            UIViewController *vc = [UIApplication sharedApplication].keyWindow.rootViewController;
+            
+            UINavigationController *nav;
+            if ([vc isKindOfClass:[UINavigationController class]]) {
+                nav = [[[vc class] alloc] initWithRootViewController:viewController];
+            } else if ([vc isKindOfClass:[UITabBarController class]]) {
+                UIViewController *controller = [(UITabBarController *)vc viewControllers][0];
+                if ([controller isKindOfClass:[UINavigationController class]]) {
+                    nav = [[[controller class] alloc] initWithRootViewController:viewController];
+                } else {
+                    nav = [[UINavigationController alloc] initWithRootViewController:viewController];
+                }
+            } else {
+                nav = [[UINavigationController alloc] initWithRootViewController:viewController];
+            }
+
+            [vc presentViewController:nav animated:YES completion:nil];
+            
+            viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"关闭" style:UIBarButtonItemStylePlain target:weakSelf action:@selector(actionQuitFeedback)];
+            
+            
+            __weak typeof(nav) weakNav = nav;
+            
+            [viewController setOpenURLBlock:^(NSString *aURLString, UIViewController *aParentController) {
+                UIViewController *webVC = [[UIViewController alloc] initWithNibName:nil bundle:nil];
+                UIWebView *webView = [[UIWebView alloc] initWithFrame:webVC.view.bounds];
+                webView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+                
+                [webVC.view addSubview:webView];
+                [weakNav pushViewController:webVC animated:YES];
+                [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aURLString]]];
+            }];
+        }
+    }];
+}
+
+- (void)actionQuitFeedback
+{
+    UIViewController *vc = [UIApplication sharedApplication].keyWindow.rootViewController;
+    [vc dismissViewControllerAnimated:YES completion:nil];
 }
 
 //保存提醒的日期和次数

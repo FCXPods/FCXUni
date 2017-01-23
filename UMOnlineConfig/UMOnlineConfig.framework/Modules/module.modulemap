@@ -1,0 +1,6 @@
+framework module UMOnlineConfig {
+  umbrella header "UMOnlineConfig.h"
+
+  export *
+  module * { export * }
+}

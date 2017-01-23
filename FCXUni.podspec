@@ -28,6 +28,8 @@ Pod::Spec.new do |s|
 
   s.source_files  = "FCXCategory/*.{h,m}", "FCXConfig/*.{h,m}", "FCXFoundation/*.{h,m}", "FCXUIKit/*.{h,m}", "FCXShare/*.{h,m}"
   s.resources = "FCXShare/ShareIcon/*.png"
+  s.vendored_frameworks = "UMOnlineConfig/UMOnlineConfig.framework"
+
   s.dependency "UMengAnalytics", "~> 4.1.8"
   s.dependency "UMengFeedback", "~> 2.3.4"
   s.dependency "UMengUShare/Social/Sina", "~> 6.2.1"
