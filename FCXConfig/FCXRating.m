@@ -17,10 +17,11 @@
 @implementation FCXRating
 {
    YWFeedbackKit *_feedbackKit;
+    UINavigationController *_navigationController;
 }
 
-+ (BOOL)startRating:(NSString *)appID bcKey:(NSString *)bcKey {
-    return [[FCXRating sharedRating] fcx_startRating:appID bcKey:bcKey];
++ (BOOL)startRating:(NSString *)appID bcKey:(NSString *)bcKey controller:(UINavigationController *)navigationController {
+    return [[FCXRating sharedRating] fcx_startRating:appID bcKey:bcKey controller:navigationController];
 }
 
 + (FCXRating *)sharedRating {
@@ -32,7 +33,7 @@
     return rating;
 }
 
-- (BOOL)fcx_startRating:(NSString *)appID bcKey:(NSString *)bcKey {
+- (BOOL)fcx_startRating:(NSString *)appID bcKey:(NSString *)bcKey controller:(UINavigationController *)navigationController {
     
     BOOL showRating = [[FCXOnlineConfig fcxGetConfigParams:@"showRating" defaultValue:@"0"] boolValue];
     if (!showRating) {
@@ -45,6 +46,11 @@
     }
     
     NSDictionary *paramsDict = [FCXOnlineConfig fcxGetJSONConfigParams:@"ratingContent"];
+//    paramsDict = @{@"标题" : @"为“新春祝福大全”评分",
+//                   @"内容" : @"程序MM日夜苦干~终于赶在节前上线，给辛勤的设计师和攻城狮一些鼓励和支持吧！",
+//                   @"按钮1" : @"去吐槽",
+//                   @"按钮2" : @"去鼓励",
+//                   @"总提醒次数" : @"3"};
     if (![paramsDict isKindOfClass:[NSDictionary class]]) {
         return NO;
     }
@@ -71,6 +77,8 @@
         return NO;
     }
     
+    _navigationController = navigationController;
+
     MAlertViw *alertView = [[MAlertViw alloc] initWithTitle:title message:content delegate:nil cancelButtonTitle:nil otherButtonTitles:btn1, btn2, nil];
     alertView.dismiss = YES;
     [alertView show];
@@ -105,28 +113,19 @@
                                  @"visitPath":@"好评->反馈"};
     
     __weak typeof(self) weakSelf = self;
-
+    __weak UINavigationController *weakNavigationController = _navigationController;
     [_feedbackKit makeFeedbackViewControllerWithCompletionBlock:^(YWFeedbackViewController *viewController, NSError *error) {
         if ( viewController != nil ) {
             viewController.title = @"意见反馈";
             
-            UIViewController *vc = [UIApplication sharedApplication].keyWindow.rootViewController;
-            
             UINavigationController *nav;
-            if ([vc isKindOfClass:[UINavigationController class]]) {
-                nav = [[[vc class] alloc] initWithRootViewController:viewController];
-            } else if ([vc isKindOfClass:[UITabBarController class]]) {
-                UIViewController *controller = [(UITabBarController *)vc viewControllers][0];
-                if ([controller isKindOfClass:[UINavigationController class]]) {
-                    nav = [[[controller class] alloc] initWithRootViewController:viewController];
-                } else {
-                    nav = [[UINavigationController alloc] initWithRootViewController:viewController];
-                }
+            if ([weakNavigationController isKindOfClass:[UINavigationController class]]) {
+                nav = [[[weakNavigationController class] alloc] initWithRootViewController:viewController];
             } else {
                 nav = [[UINavigationController alloc] initWithRootViewController:viewController];
             }
 
-            [vc presentViewController:nav animated:YES completion:nil];
+            [weakNavigationController presentViewController:nav animated:YES completion:nil];
             
             viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"关闭" style:UIBarButtonItemStylePlain target:weakSelf action:@selector(actionQuitFeedback)];
             
