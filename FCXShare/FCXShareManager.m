@@ -377,6 +377,8 @@ UIImage *ImageWithColor(UIColor *color) {
     }
 
     [self judgeBottomHeight];
+    _scrollView.contentOffset = CGPointZero;
+    
     _bottomView.frame = CGRectMake(0, Share_ScreenHeight(), Share_ScreenWidth(), _bottomHeight);
     _cancelButton.frame = CGRectMake(0, _bottomHeight - 44, Share_ScreenWidth(), 44);
     [self createShareButtons];
