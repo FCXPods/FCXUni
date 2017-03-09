@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
   s.resources = "FCXShare/ShareIcon/*.png"
   s.vendored_frameworks = "UMOnlineConfig/UMOnlineConfig.framework", "BCFeedback/AmrCodecFMWK.framework", "BCFeedback/UTDID.framework", "BCFeedback/UTMini.framework", "BCFeedback/WQConnectorBundle.framework", "BCFeedback/YWFeedbackFMWK.framework", "BCFeedback/YWHybridWebViewFMWK.framework"
 
-  s.dependency "UMengAnalytics", "~> 4.1.8"
+  s.dependency "UMengAnalytics", "~> 4.2.4"
   s.dependency "UMengFeedback", "~> 2.3.4"
   s.dependency "UMengUShare/Social/Sina", "~> 6.2.1"
   s.dependency "UMengUShare/Social/WeChat", "~> 6.2.1"
