@@ -11,13 +11,20 @@
 
 @interface FCXRating : NSObject <SKStoreProductViewControllerDelegate>
 
++ (void)setup;
+
 /**
  *  调用评价
  *
  *  @param appID 当前应用的appID
- *  @param Bool 是否能够弹出好评
+ *  @param bcKey 百川key
+ *  @param controller
+ *  @param finish 完成回调
  */
-+ (BOOL)startRating:(NSString*)appID bcKey:(NSString *)bcKey controller:(UINavigationController *)navigationController;
++ (void)startRating:(NSString*)appID
+              bcKey:(NSString *)bcKey
+         controller:(UINavigationController *)navigationController
+             finish:(void(^)(BOOL success))finish;
 + (void)goAppStore:(NSString*)appID;//!<下载页
 + (void)goRating:(NSString *)appID;//!<评价页
 
