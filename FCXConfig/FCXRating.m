@@ -315,23 +315,29 @@
     [request setTimeoutInterval: 2];
     [request setHTTPShouldHandleCookies:FALSE];
     [request setHTTPMethod:@"GET"];
-    
+    NSLog(@"requestIP=======    ");
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
+        NSLog(@"finish");
         if (data) {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
             //            NSLog(@"json ==%@ ==%@", dict, dict[@"country"]);
             if ([dict isKindOfClass:[NSDictionary class]]) {
                 _county = dict[@"country"];
                 if (finish) {
-                    finish(_county);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        finish(_county);
+                    });
                 }
             } else if (finish) {
-                finish(nil);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    finish(_county);
+                });
             }
         } else if (finish) {
-            finish(nil);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                finish(_county);
+            });
         }
         /*
          if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
