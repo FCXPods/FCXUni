@@ -331,12 +331,12 @@
                 }
             } else if (finish) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    finish(_county);
+                    finish(nil);
                 });
             }
         } else if (finish) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                finish(_county);
+                finish(nil);
             });
         }
         /*
