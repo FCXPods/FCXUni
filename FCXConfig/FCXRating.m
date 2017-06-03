@@ -178,7 +178,6 @@
     _feedbackKit.extInfo = @{@"loginTime":[[NSDate date] description],
                                  @"visitPath":@"好评->反馈"};
     
-    __weak typeof(self) weakSelf = self;
     __weak UINavigationController *weakNavigationController = _navigationController;
     [_feedbackKit makeFeedbackViewControllerWithCompletionBlock:^(YWFeedbackViewController *viewController, NSError *error) {
         if ( viewController != nil ) {
