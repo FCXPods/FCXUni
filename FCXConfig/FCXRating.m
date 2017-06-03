@@ -8,9 +8,9 @@
 
 #import "FCXRating.h"
 #import "FCXGuide.h"
-#import "UMFeedback.h"
 #import "FCXOnlineConfig.h"
 #import <YWFeedbackFMWK/YWFeedbackKit.h>
+#import <YWFeedbackFMWK/YWFeedbackViewController.h>
 
 #define HASRATING @"HasRating"
 
@@ -193,19 +193,8 @@
 
             [weakNavigationController presentViewController:nav animated:YES completion:nil];
             
-            viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"关闭" style:UIBarButtonItemStylePlain target:weakSelf action:@selector(actionQuitFeedback)];
-            
-            
-            __weak typeof(nav) weakNav = nav;
-            
-            [viewController setOpenURLBlock:^(NSString *aURLString, UIViewController *aParentController) {
-                UIViewController *webVC = [[UIViewController alloc] initWithNibName:nil bundle:nil];
-                UIWebView *webView = [[UIWebView alloc] initWithFrame:webVC.view.bounds];
-                webView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-                
-                [webVC.view addSubview:webView];
-                [weakNav pushViewController:webVC animated:YES];
-                [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:aURLString]]];
+            [viewController setCloseBlock:^(UIViewController *aParentController){
+                [aParentController dismissViewControllerAnimated:YES completion:nil];
             }];
         }
     }];
