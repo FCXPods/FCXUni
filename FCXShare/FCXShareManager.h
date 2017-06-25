@@ -42,6 +42,12 @@ typedef NS_ENUM(NSInteger, FCXSharePlatform) {
 @property (nonatomic, strong) NSString *shareImageURL;//!<分享图片URL（qq分享音乐用）
 @property (nonatomic, strong) NSString *musicURL;//!<音乐分享连接地址
 @property (nonatomic, strong) NSData *emotionData;//!<分享的gif图片的data
+@property (nonatomic, strong) UIColor *bottomBgColor;//!<底部的背景色
+@property (nonatomic, strong) UIColor *midLineColor;
+@property (nonatomic, strong) UIColor *bottomLineColor;
+
+
+- (void)setCancelButtonBackgroundImageColor:(nullable UIColor *)color forState:(UIControlState)state;
 
 
 /**
@@ -75,5 +81,7 @@ typedef NS_ENUM(NSInteger, FCXSharePlatform) {
 - (void)shareToSina;
 - (void)shareToSms;
 - (void)shareToPlatform:(FCXSharePlatform)platform;
+
+- (void)showSystemShare;
 
 @end

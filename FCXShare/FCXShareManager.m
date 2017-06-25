@@ -59,6 +59,7 @@ UIImage *ImageWithColor(UIColor *color) {
     UIColor *_titleSelectedColor;
     UIScrollView *_scrollView;
     UIView *_midLine;
+    UIView *_bottomLine;
 }
 
 @property (nonatomic, unsafe_unretained) NSInteger managerType;//0竖直方向 1水平方向
@@ -106,7 +107,7 @@ UIImage *ImageWithColor(UIColor *color) {
         [self judgeBottomHeight];
         
         _bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, Share_ScreenHeight(), Share_ScreenWidth(), _bottomHeight)];
-        _bottomView.backgroundColor = SHARE_UICOLOR_FROMRGB(0xfce5af);
+        _bottomView.backgroundColor = SHARE_UICOLOR_FROMRGB(0xf8f8f8);
         [self addSubview:_bottomView];
         
         _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 25 + 85 + 18)];
@@ -122,8 +123,8 @@ UIImage *ImageWithColor(UIColor *color) {
         [_bottomView addSubview:_midLine];
 
             _cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_cancelButton setBackgroundImage:ImageWithColor(SHARE_UICOLOR_FROMRGB(0xfff0cc)) forState:UIControlStateNormal];
-        [_cancelButton setBackgroundImage:ImageWithColor(SHARE_UICOLOR_FROMRGB(0xfff5dd)) forState:UIControlStateHighlighted];
+        [_cancelButton setBackgroundImage:ImageWithColor(SHARE_UICOLOR_FROMRGB(0xffffff)) forState:UIControlStateNormal];
+        [_cancelButton setBackgroundImage:ImageWithColor(SHARE_UICOLOR_FROMRGB(0xebebeb)) forState:UIControlStateHighlighted];
         [_cancelButton setTitle:@"取消" forState:UIControlStateNormal];
         [_cancelButton setTitleColor:_titleNormalColor forState:UIControlStateNormal];
         [_cancelButton setTitleColor:_titleHighLightedColor forState:UIControlStateHighlighted];
@@ -131,9 +132,9 @@ UIImage *ImageWithColor(UIColor *color) {
         _cancelButton.frame = CGRectMake(0, _bottomHeight - 44, Share_ScreenWidth(), 44);
         [_bottomView addSubview:_cancelButton];
         
-        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0, 0, Share_ScreenWidth(), .5)];
-        line.backgroundColor = SHARE_UICOLOR_FROMRGB(0xe2cb93);
-        [_cancelButton addSubview:line];
+        _bottomLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, Share_ScreenWidth(), .5)];
+        _bottomLine.backgroundColor = SHARE_UICOLOR_FROMRGB(0xdddddd);
+        [_cancelButton addSubview:_bottomLine];
         
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction)];
         [self addGestureRecognizer:tap];
@@ -330,7 +331,7 @@ UIImage *ImageWithColor(UIColor *color) {
                                    normalImage:(NSString *)normalImage
                               highlightedImage:(NSString *)highlightedImage
                                      superView:(UIView *)superView {
-    FCXShareButton *button = (UIButton *)[superView viewWithTag:tag];
+    FCXShareButton *button = (FCXShareButton *)[superView viewWithTag:tag];
     if ([button isKindOfClass:[UIButton class]]) {
         button.frame = frame;
         return button;
@@ -699,9 +700,77 @@ UIImage *ImageWithColor(UIColor *color) {
 - (void)setCollection:(BOOL)collection {
     if (_collection != collection) {
         _collection = collection;
-        FCXShareButton *button = (UIButton *)[_bottomView viewWithTag:FCXSharePlatformCollection];
+        FCXShareButton *button = (FCXShareButton *)[_bottomView viewWithTag:FCXSharePlatformCollection];
         button.selected = collection;
     }
+}
+
+- (void)setBottomBgColor:(UIColor *)bottomBgColor {
+    _bottomView.backgroundColor = bottomBgColor;
+}
+
+- (void)setMidLineColor:(UIColor *)midLineColor {
+    _midLine.backgroundColor = midLineColor;
+}
+
+- (void)setBottomLineColor:(UIColor *)bottomLineColor {
+    _bottomLine.backgroundColor = bottomLineColor;
+}
+
+- (void)setCancelButtonBackgroundImageColor:(UIColor *)color forState:(UIControlState)state {
+    [_cancelButton setBackgroundImage:ImageWithColor(color) forState:state];
+}
+
+- (void)showSystemShare {
+    NSArray* activityItems;
+
+    switch (_shareType) {
+        case FCXShareTypeDefault:
+        {
+            activityItems = @[[self systemShareText], [NSURL URLWithString:_shareURL], _shareImage];
+        }
+            break;
+        case FCXShareTypeImage:
+        {
+            activityItems = @[_shareImage];
+        }
+            break;
+        case FCXShareTypeText:
+        {
+            activityItems = @[[self systemShareText]];
+        }
+            break;
+        case FCXShareTypeEmotion:
+        {
+            return;
+        }
+            break;
+        case FCXShareTypeMusic:
+        {
+            return;
+        }
+            break;
+    }
+
+    UIActivityViewController *activeViewController = [[UIActivityViewController alloc]initWithActivityItems:activityItems applicationActivities:nil];
+    //不显示哪些分享平台(具体支持那些平台，可以查看Xcode的api)
+    activeViewController.excludedActivityTypes = @[UIActivityTypeAirDrop,UIActivityTypeCopyToPasteboard, UIActivityTypeAddToReadingList, UIActivityTypePrint, UIActivityTypeSaveToCameraRoll, UIActivityTypeCopyToPasteboard];
+    [self.presentedController presentViewController:activeViewController animated:YES completion:nil];
+}
+
+- (NSString *)systemShareText {
+    NSString *shareText = @"";
+    if (_shareTitle) {
+        shareText = _shareTitle;
+    }
+    if (_shareContent) {
+        shareText = [shareText stringByAppendingFormat:@"--%@", _shareContent];
+    }
+    
+    if (shareText.length > 100) {
+        shareText = [shareText substringToIndex:100];
+    }
+    return shareText;
 }
 
 @end
