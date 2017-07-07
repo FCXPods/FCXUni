@@ -287,12 +287,26 @@
         return;
     }
     
-    NSString *strUrl =[NSString stringWithFormat: @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@", appID];
-    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:strUrl]]) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:strUrl]];
-    }else{
-        strUrl =[NSString stringWithFormat: @"https://itunes.apple.com/app/id%@", appID];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:strUrl]];
+    NSString  * strUrl = [NSString  stringWithFormat: @"itms-apps://itunes.apple.com/app/id%@?action=write-review", appID];
+    UIApplication *application = [UIApplication sharedApplication];
+    NSURL *url = [NSURL URLWithString:strUrl];
+    if ([application canOpenURL:url]) {
+        [application openURL:url];
+        return;
+    }
+    
+    strUrl =[NSString stringWithFormat: @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@", appID];
+    url = [NSURL URLWithString:strUrl];
+    if ([application canOpenURL:url]) {
+        [application openURL:url];
+        return;
+    }
+    
+    strUrl =[NSString stringWithFormat: @"https://itunes.apple.com/app/id%@", appID];
+    url = [NSURL URLWithString:strUrl];
+    if ([application canOpenURL:url]) {
+        [application openURL:url];
+        return;
     }
 }
 
@@ -303,10 +317,10 @@
     [request setTimeoutInterval: 2];
     [request setHTTPShouldHandleCookies:FALSE];
     [request setHTTPMethod:@"GET"];
-    NSLog(@"requestIP=======    ");
+//    NSLog(@"requestIP=======    ");
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        NSLog(@"finish");
+//        NSLog(@"finish");
         if (data) {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
             //            NSLog(@"json ==%@ ==%@", dict, dict[@"country"]);
