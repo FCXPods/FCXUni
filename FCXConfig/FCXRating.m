@@ -116,6 +116,7 @@
     NSString *title = [paramsDict objectForKey:@"标题"];
     NSString *content = [paramsDict objectForKey:@"内容"];
     NSString *btn1 = [paramsDict objectForKey:@"按钮1"];
+    NSInteger lAction = [[paramsDict objectForKey:@"lAction"] integerValue];
     NSString *btn2 = [paramsDict objectForKey:@"按钮2"];
     //    NSString *btn3 = [paramsDict objectForKey:@"按钮3"];
     NSInteger alertTimes = [[paramsDict objectForKey:@"总提醒次数"] integerValue];
@@ -151,11 +152,13 @@
     alertView.handleAction = ^(MAlertViw *alertView, NSInteger buttonIndex){
         
         if (buttonIndex == 0) {
+            if (lAction == 0) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    
+                    [self goFeedbcak:bcKey];
+                });
+            }
 
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                
-                [self goFeedbcak:bcKey];
-            });            
         }else if(buttonIndex == 1) {
             
             [FCXRating goRating:appID];

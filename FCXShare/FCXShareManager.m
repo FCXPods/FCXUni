@@ -750,6 +750,11 @@ UIImage *ImageWithColor(UIColor *color) {
             return;
         }
             break;
+        case FCXShareTypeVideo:
+        {
+            activityItems = @[[NSURL fileURLWithPath:_videoPath]];
+        }
+            break;
     }
 
     UIActivityViewController *activeViewController = [[UIActivityViewController alloc]initWithActivityItems:activityItems applicationActivities:nil];

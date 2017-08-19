@@ -13,7 +13,8 @@ typedef NS_ENUM(NSInteger, FCXShareType) {
     FCXShareTypeImage,   //!<图片分享
     FCXShareTypeText,   //!<文本分享
     FCXShareTypeEmotion, //!<表情数据，如GIF等
-    FCXShareTypeMusic    //!<音乐分享
+    FCXShareTypeMusic,    //!<音乐分享
+    FCXShareTypeVideo,    //!<视频分享
 };
 
 typedef NS_ENUM(NSInteger, FCXSharePlatform) {
@@ -45,6 +46,7 @@ typedef NS_ENUM(NSInteger, FCXSharePlatform) {
 @property (nonatomic, strong) UIColor *bottomBgColor;//!<底部的背景色
 @property (nonatomic, strong) UIColor *midLineColor;
 @property (nonatomic, strong) UIColor *bottomLineColor;
+@property (nonatomic, strong) NSString *videoPath;//!<视频路径
 
 
 - (void)setCancelButtonBackgroundImageColor:(nullable UIColor *)color forState:(UIControlState)state;
