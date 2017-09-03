@@ -26,10 +26,11 @@
 }
 
 + (void)startRating:(NSString*)appID
-              bcKey:(NSString *)bcKey
+              alKey:(NSString *)alKey
+          alSecrect:(NSString *)alSecrect
          controller:(UINavigationController *)navigationController
              finish:(void(^)(BOOL success))finish {
-    return [[FCXRating sharedRating] fcx_startRating:appID bcKey:bcKey controller:navigationController finish:finish];
+    return [[FCXRating sharedRating] fcx_startRating:appID alKey:alKey alSecrect:alSecrect controller:navigationController finish:finish];
 }
 
 + (FCXRating *)sharedRating {
@@ -42,7 +43,8 @@
 }
 
 - (void)fcx_startRating:(NSString *)appID
-                  bcKey:(NSString *)bcKey
+                  alKey:(NSString *)alKey
+              alSecrect:(NSString *)alSecrect
              controller:(UINavigationController *)navigationController
                  finish:(void(^)(BOOL success))finish {
     
@@ -82,7 +84,7 @@
         
         if (_county) {
             if ([_county isEqualToString:@"中国"]) {
-                [self showRating:appID bcKey:bcKey finish:finish];
+                [self showRating:appID alKey:alKey alSecrect:alSecrect finish:finish];
             } else {
                 if (finish) {
                     finish(NO);
@@ -91,7 +93,7 @@
         } else {
             [self requestIP:^(NSString *county) {
                 if (county && [county isEqualToString:@"中国"]) {
-                    [self showRating:appID bcKey:bcKey finish:finish];
+                    [self showRating:appID alKey:alKey alSecrect:alSecrect finish:finish];
                 } else {
                     if (finish) {
                         finish(NO);
@@ -100,11 +102,14 @@
             }];
         }
     } else {//不判断IP
-        [self showRating:appID bcKey:bcKey finish:finish];
+        [self showRating:appID alKey:alKey alSecrect:alSecrect finish:finish];
     }
 }
 
-- (void)showRating:(NSString *)appID bcKey:(NSString *)bcKey finish:(void (^)(BOOL))finish {
+- (void)showRating:(NSString *)appID
+             alKey:(NSString *)alKey
+         alSecrect:(NSString *)alSecrect
+            finish:(void (^)(BOOL))finish {
     NSDictionary *paramsDict = [FCXOnlineConfig fcxGetJSONConfigParams:@"ratingContent"];
     if (![paramsDict isKindOfClass:[NSDictionary class]]) {
         if (finish) {
@@ -155,7 +160,7 @@
             if (lAction == 0) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     
-                    [self goFeedbcak:bcKey];
+                    [self goFeedbcak:alKey alSecrect:alSecrect];
                 });
             }
 
@@ -174,8 +179,8 @@
     }
 }
 
-- (void)goFeedbcak:(NSString *)bcKey {
-    _feedbackKit = [[YWFeedbackKit alloc] initWithAppKey:bcKey];
+- (void)goFeedbcak:(NSString *)alKey alSecrect:alSecrect {
+    _feedbackKit = [[YWFeedbackKit alloc] initWithAppKey:alKey appSecret:alSecrect];
     
     // 设置App自定义扩展反馈数据
     _feedbackKit.extInfo = @{@"loginTime":[[NSDate date] description],

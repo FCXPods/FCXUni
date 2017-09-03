@@ -59,10 +59,10 @@
         [alertView show];
         alertView.handleAction = ^(MAlertViw *alertView, NSInteger buttonIndex){
             if (url && [url hasPrefix:@"http"]) {
-                [MobClick event:@"引导" label:url];
+                [MobClick event:@"导流" label:url];
                 
             } else {
-                [MobClick event:@"引导" label:appid];
+                [MobClick event:@"导流" label:appid];
                 url = [NSString stringWithFormat: @"https://itunes.apple.com/us/app/id%@", appid];
             }
             
@@ -87,16 +87,16 @@
 
             if (buttonIndex == 1) {
                 if (url && [url hasPrefix:@"http"]) {
-                    [MobClick event:@"引导" label:url];
+                    [MobClick event:@"导流" label:url];
  
                 } else {
-                    [MobClick event:@"引导" label:appid];
+                    [MobClick event:@"导流" label:appid];
                     url = [NSString stringWithFormat: @"https://itunes.apple.com/us/app/id%@", appid];
                 }
 
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
             }else {
-                [MobClick event:@"引导" label:left];
+                [MobClick event:@"导流" label:left];
             }
 
         };

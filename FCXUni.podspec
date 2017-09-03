@@ -26,12 +26,15 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/FCXPods/FCXUni.git", :tag => "0.0.1" }
 
 
-  s.source_files  = "FCXCategory/*.{h,m}", "FCXConfig/*.{h,m}", "FCXFoundation/*.{h,m}", "FCXUIKit/*.{h,m}", "FCXShare/*.{h,m}"
+  s.source_files  = "FCXCategory/*.{h,m}", "FCXConfig/*.{h,m}", "FCXFoundation/*.{h,m}", "FCXUIKit/*.{h,m}", "FCXShare/*.{h,m}", "MTA/*.h"
   s.resources = "FCXShare/ShareIcon/*.png"
-  s.vendored_frameworks = "UMOnlineConfig/UMOnlineConfig.framework"
+  s.vendored_libraries = "MTA/*.a"
+  s.vendored_frameworks = "UMOnlineConfig/UMOnlineConfig.framework", "QuartzCore", "Security", "CFNetwork", "SystemConfiguration", "CoreTelephony", "Foundation", "CoreGraphics"
+  s.libraries = "z", "iconv", "sqlite3"
+
 
   s.dependency "UMengAnalytics", "~> 4.2.4"
-  s.dependency "YWFeedbackFMWK", "~> 2.0.3.1"
+  s.dependency "AlicloudFeedback", "~> 3.2.0"
   s.dependency "UMengUShare/Social/Sina", "~> 6.2.1"
   s.dependency "UMengUShare/Social/WeChat", "~> 6.2.1"
   s.dependency "UMengUShare/Social/QQ", "~> 6.2.1"

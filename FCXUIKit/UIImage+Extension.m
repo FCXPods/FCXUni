@@ -359,4 +359,38 @@ static inline CGFloat DegreesToRadians(CGFloat degrees)
     return theImage;
 }
 
+-(UIImage *) imageCompressForWidth:(UIImage *)sourceImage targetWidth:(CGFloat)defineWidth {
+    CGSize imageSize = sourceImage.size;
+    CGFloat width = imageSize.width;
+    CGFloat height = imageSize.height;
+    CGFloat targetWidth = defineWidth;
+    CGFloat targetHeight = (targetWidth / width) * height;
+    UIGraphicsBeginImageContext(CGSizeMake(targetWidth, targetHeight));
+    [sourceImage drawInRect:CGRectMake(0,0,targetWidth,  targetHeight)];
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+/**
+ 压图片质量
+ 
+ @param image image
+ @return Data
+ */
+
+//+ (NSData *)zipImageWithImage:(UIImage *)image
+//{
+//    if (!image) {
+//        return nil;
+//    }
+//    CGFloat maxFileSize = 32*1024;
+//    CGFloat compression = 0.9f;
+//    NSData *compressedData = UIImageJPEGRepresentation(image, compression);
+//    while ([compressedData length] > maxFileSize) {
+//        compression *= 0.9;
+//        compressedData = UIImageJPEGRepresentation([[self class] compressImage:image newWidth:image.size.width*compression], compression);
+//    }
+//    return compressedData;
+//}
+
 @end

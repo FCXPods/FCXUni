@@ -17,12 +17,14 @@
  *  调用评价
  *
  *  @param appID 当前应用的appID
- *  @param bcKey 百川key
- *  @param controller
+ *  @param alKey 阿里key
+ *  @param alSecrect secrect
+ *  @param navigationController controller
  *  @param finish 完成回调
  */
 + (void)startRating:(NSString*)appID
-              bcKey:(NSString *)bcKey
+              alKey:(NSString *)alKey
+          alSecrect:(NSString *)alSecrect
          controller:(UINavigationController *)navigationController
              finish:(void(^)(BOOL success))finish;
 + (void)goAppStore:(NSString*)appID;//!<下载页
