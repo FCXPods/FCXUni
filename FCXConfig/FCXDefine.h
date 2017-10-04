@@ -13,7 +13,13 @@
 #pragma mark - 屏幕宽高
 #define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
 #define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
+#define StatusBar_Height [[UIApplication sharedApplication] statusBarFrame].size.height
+#define NavBar_Height 44.0
+#define Nav_StatusBar_Height (NavBar_Height + StatusBar_Height)
+#define TabBar_Height ([[UIApplication sharedApplication] statusBarFrame].size.height > 20 ? 83 : 49)
+#define KBottomSpace_Height ([[UIApplication sharedApplication] statusBarFrame].size.height > 20 ? 34 : 0)
 
+#define Screen_Scale ([UIScreen mainScreen].bounds.size.width/375.0)
 
 #pragma mark -  颜色相关
 #define UICOLOR_FROMRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]

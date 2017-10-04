@@ -8,7 +8,7 @@
 
 #import "FCXGuide.h"
 #import "FCXOnlineConfig.h"
-#import <UMMobClick/MobClick.h>
+#import "FCXA.h"
 
 @implementation MAlertViw
 
@@ -37,16 +37,13 @@
 - (void)fcx_startGuide {
 //    NSString *paramsString = @"{ \"导流形式\" : \"1\", \"标题\" : \"铃声\", \"内容\" : \"导流测试\", \"左按钮\" : \"以后再说\", \"右按钮\" : \"马上下载\", \"appid\" : \"2\"}";
     
-
-    NSString *paramsString = [FCXOnlineConfig fcxGetConfigParams:@"guideContent" defaultValue:@""];
-    NSDictionary *paramsDict = [NSJSONSerialization JSONObjectWithData:[paramsString dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableLeaves error:nil];
-
+    NSDictionary *paramsDict = [FCXOnlineConfig fcxGetJSONConfigParams:@"guideContent"];
 //    NSLog(@"==%@", paramsDict);
-    NSString *type = [paramsDict objectForKey:@"导流形式"];
-    NSString *title = [paramsDict objectForKey:@"标题"];
-    NSString *content = [paramsDict objectForKey:@"内容"];
-    NSString *left = [paramsDict objectForKey:@"左按钮"];
-    NSString *right = [paramsDict objectForKey:@"右按钮"];
+    NSString *type = [paramsDict objectForKey:@"type"];
+    NSString *title = [paramsDict objectForKey:@"title"];
+    NSString *content = [paramsDict objectForKey:@"content"];
+    NSString *left = [paramsDict objectForKey:@"left"];
+    NSString *right = [paramsDict objectForKey:@"right"];
     NSString *appid = [paramsDict objectForKey:@"appid"];
     __block NSString *url = [paramsDict objectForKey:@"url"];
 
@@ -59,10 +56,10 @@
         [alertView show];
         alertView.handleAction = ^(MAlertViw *alertView, NSInteger buttonIndex){
             if (url && [url hasPrefix:@"http"]) {
-                [MobClick event:@"导流" label:url];
+                [FCXA event:@"导流" label:url];
                 
             } else {
-                [MobClick event:@"导流" label:appid];
+                [FCXA event:@"导流" label:appid];
                 url = [NSString stringWithFormat: @"https://itunes.apple.com/us/app/id%@", appid];
             }
             
@@ -74,7 +71,7 @@
         }
         
         //1每次 2每天
-        NSString *rate = [paramsDict objectForKey:@"弹出机制"];
+        NSString *rate = [paramsDict objectForKey:@"rate"];
         if (![self shouldShowGuide:rate.integerValue]) {
             return;
         }
@@ -87,16 +84,16 @@
 
             if (buttonIndex == 1) {
                 if (url && [url hasPrefix:@"http"]) {
-                    [MobClick event:@"导流" label:url];
+                    [FCXA event:@"导流" label:url];
  
                 } else {
-                    [MobClick event:@"导流" label:appid];
+                    [FCXA event:@"导流" label:appid];
                     url = [NSString stringWithFormat: @"https://itunes.apple.com/us/app/id%@", appid];
                 }
 
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
             }else {
-                [MobClick event:@"导流" label:left];
+                [FCXA event:@"导流" label:left];
             }
 
         };

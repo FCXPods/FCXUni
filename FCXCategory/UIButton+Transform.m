@@ -14,7 +14,7 @@
 + (void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [self swizzleInstanceMethodWithClass:[self class] originalSelector:@selector(sendAction:to:forEvent:) swizzledMethod:@selector(fcxSendAction:to:forEvent:)];
+//        [self swizzleInstanceMethodWithClass:[self class] originalSelector:@selector(sendAction:to:forEvent:) swizzledMethod:@selector(fcxSendAction:to:forEvent:)];
     });
 }
 

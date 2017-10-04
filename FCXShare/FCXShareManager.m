@@ -60,6 +60,7 @@ UIImage *ImageWithColor(UIColor *color) {
     UIScrollView *_scrollView;
     UIView *_midLine;
     UIView *_bottomLine;
+    CGFloat _bottomSpaceHeight;
 }
 
 @property (nonatomic, unsafe_unretained) NSInteger managerType;//0竖直方向 1水平方向
@@ -103,6 +104,7 @@ UIImage *ImageWithColor(UIColor *color) {
         _titleNormalColor = SHARE_UICOLOR_FROMRGB(0x333333);
         _titleHighLightedColor = SHARE_UICOLOR_FROMRGB(0x999999);
         _titleSelectedColor = SHARE_UICOLOR_FROMRGB(0x9c1421);
+        _bottomSpaceHeight = [[UIApplication sharedApplication] statusBarFrame].size.height > 20 ? 34 : 0;
 
         [self judgeBottomHeight];
         
@@ -129,7 +131,10 @@ UIImage *ImageWithColor(UIColor *color) {
         [_cancelButton setTitleColor:_titleNormalColor forState:UIControlStateNormal];
         [_cancelButton setTitleColor:_titleHighLightedColor forState:UIControlStateHighlighted];
         [_cancelButton addTarget:self action:@selector(tapAction) forControlEvents:UIControlEventTouchUpInside];
-        _cancelButton.frame = CGRectMake(0, _bottomHeight - 44, Share_ScreenWidth(), 44);
+        _cancelButton.frame = CGRectMake(0, _bottomHeight - _bottomSpaceHeight - 44, Share_ScreenWidth(), 44 + _bottomSpaceHeight);
+        if (_bottomSpaceHeight > 0) {
+            _cancelButton.titleEdgeInsets = UIEdgeInsetsMake(-_bottomSpaceHeight, 0, 0, 0);
+        }
         [_bottomView addSubview:_cancelButton];
         
         _bottomLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, Share_ScreenWidth(), .5)];
@@ -145,7 +150,7 @@ UIImage *ImageWithColor(UIColor *color) {
 //根据第三方平台是否安装情况判断显示高度
 - (void)judgeBottomHeight {
     if (_managerType == 1) {
-        _bottomHeight = 25 + 85 + 25 + 18 + 85 + 25 + 44;
+        _bottomHeight = 25 + 85 + 25 + 18 + 85 + 25 + 44 + _bottomSpaceHeight;
         int count = 2;
         if ([WXApi isWXAppInstalled]) {
             count += 2;
@@ -160,10 +165,10 @@ UIImage *ImageWithColor(UIColor *color) {
     
     if ([WXApi isWXAppInstalled] && [QQApiInterface isQQInstalled]){
 //        _bottomHeight = 265;
-        _bottomHeight = 25 + 85 * 2 + 15 + 25 + 44;
+        _bottomHeight = 25 + 85 * 2 + 15 + 25 + 44 + _bottomSpaceHeight;
     }else{
 //        _bottomHeight = 265 - 80;
-        _bottomHeight = 25 + 85 + 25 + 44;
+        _bottomHeight = 25 + 85 + 25 + 44 + _bottomSpaceHeight;
     }
     _scrollView.frame = CGRectMake(0, 0, Share_ScreenWidth(), _bottomHeight - 44);
     _scrollView.contentSize = _scrollView.frame.size;
@@ -381,7 +386,7 @@ UIImage *ImageWithColor(UIColor *color) {
     _scrollView.contentOffset = CGPointZero;
     
     _bottomView.frame = CGRectMake(0, Share_ScreenHeight(), Share_ScreenWidth(), _bottomHeight);
-    _cancelButton.frame = CGRectMake(0, _bottomHeight - 44, Share_ScreenWidth(), 44);
+    _cancelButton.frame = CGRectMake(0, _bottomHeight - _bottomSpaceHeight - 44, Share_ScreenWidth(), 44 + _bottomSpaceHeight);
     [self createShareButtons];
     UIWindow* window = [UIApplication sharedApplication].keyWindow;
     self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
