@@ -257,7 +257,7 @@
         [userDefaults setObject:ratingVersion forKey:@"RatingAppVersion"];
         
         //清楚之前版本的缓存
-        [userDefaults removeObjectForKey:HASRATING];
+//        [userDefaults removeObjectForKey:HASRATING];
         [userDefaults removeObjectForKey:@"alertTimes"];
     }
     [userDefaults synchronize];
