@@ -10,6 +10,7 @@
 #import "FCXOnlineConfig.h"
 #import "FCXA.h"
 
+static NSString *const FCXHasGuide = @"FCXHasGuide";
 @implementation MAlertViw
 
 - (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated {
@@ -70,6 +71,13 @@
             return;
         }
         
+        //导流过不再弹
+        if ([self hasGuide:appid]) {
+            return;
+        } else if ([self hasGuide:url]) {
+            return;
+        }
+        
         //1每次 2每天
         NSString *rate = [paramsDict objectForKey:@"rate"];
         if (![self shouldShowGuide:rate.integerValue]) {
@@ -85,10 +93,11 @@
             if (buttonIndex == 1) {
                 if (url && [url hasPrefix:@"http"]) {
                     [FCXA event:@"导流" label:url];
- 
+                    [self saveGuide:url];
                 } else {
                     [FCXA event:@"导流" label:appid];
                     url = [NSString stringWithFormat: @"https://itunes.apple.com/us/app/id%@", appid];
+                    [self saveGuide:appid];
                 }
 
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
@@ -100,6 +109,19 @@
     }
 }
 
+- (BOOL)hasGuide:(NSString *)appID {
+    if (!appID) {
+        return NO;
+    }
+    return  [[NSUserDefaults standardUserDefaults] boolForKey:[FCXHasGuide stringByAppendingString:appID]];
+}
+
+- (void)saveGuide:(NSString *)appID {
+    if (appID) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[FCXHasGuide stringByAppendingString:appID]];
+        [[NSUserDefaults standardUserDefaults]synchronize];
+    }
+}
 
 ///获取当前时间的字符串
 - (NSString *)getCurrentDateString {

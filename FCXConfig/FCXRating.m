@@ -11,6 +11,7 @@
 #import "FCXOnlineConfig.h"
 #import <YWFeedbackFMWK/YWFeedbackKit.h>
 #import <YWFeedbackFMWK/YWFeedbackViewController.h>
+#import <StoreKit/SKStoreReviewController.h>
 
 #define HASRATING @"HasRating"
 
@@ -123,9 +124,23 @@
     NSString *btn1 = [paramsDict objectForKey:@"按钮1"];
     NSInteger lAction = [[paramsDict objectForKey:@"lAction"] integerValue];
     NSString *btn2 = [paramsDict objectForKey:@"按钮2"];
+    NSInteger rAction = [[paramsDict objectForKey:@"rAction"] integerValue];
+    NSString *rURL = [paramsDict objectForKey:@"rURL"];
+
     //    NSString *btn3 = [paramsDict objectForKey:@"按钮3"];
     NSInteger alertTimes = [[paramsDict objectForKey:@"总提醒次数"] integerValue];
     
+    if (rAction == 3) {//应用内好评
+        if([SKStoreReviewController respondsToSelector:@selector(requestReview)]) {
+            [SKStoreReviewController requestReview];
+            if (finish) {
+                finish(YES);
+            }
+            [FCXRating saveRating];
+            return;
+        }
+    }
+
     if (!title || !content || !btn1 || !btn2) {
         if (finish) {
             finish(NO);
@@ -166,7 +181,31 @@
 
         }else if(buttonIndex == 1) {
             
-            [FCXRating goRating:appID];
+            UIApplication *application = [UIApplication sharedApplication];
+            if (rURL.length > 0 && [application canOpenURL:[NSURL URLWithString:rURL]]) {
+                [application openURL:[NSURL URLWithString:rURL]];
+            } else if (rAction == 1) {
+                NSURL *url = [NSURL URLWithString:[NSString  stringWithFormat: @"itms-apps://itunes.apple.com/app/id%@?action=write-review", appID]];
+                if ([application canOpenURL:url]) {
+                    [application openURL:url];
+                } else {
+                    [FCXRating goRating:appID];
+                }
+                
+            } else if (rAction == 2) {
+                NSURL *url = [NSURL URLWithString:[NSString  stringWithFormat: @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@", appID]];
+                if ([application canOpenURL:url]) {
+                    [application openURL:url];
+                } else {
+                    [FCXRating goRating:appID];
+                }
+                
+            } else if (rAction == 3) {
+                [FCXRating goRating:appID];
+            } else {
+                [FCXRating goRating:appID];
+            }
+            
             [FCXRating saveRating];
         }else {
             //            [FCXRating saveRating];
