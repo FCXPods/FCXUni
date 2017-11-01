@@ -68,6 +68,7 @@
     _navigationController = navigationController;
 
     BOOL judgeIP = [FCXOnlineConfig fcxGetConfigParams:@"judgeIP" defaultValue:@"1"].boolValue;
+    BOOL foreignShow = [FCXOnlineConfig fcxGetBoolConfigParams:@"foreignShow" defaultValue:@"0"];
     if (judgeIP) {//判断IP
         NSDictionary *timeDict = [FCXOnlineConfig fcxGetJSONConfigParams:@"ratingTime"];
         NSInteger min = 10, max = 21;
@@ -85,31 +86,40 @@
         
         if (_county) {
             if ([_county isEqualToString:@"中国"]) {
-                [self showRating:appID alKey:alKey alSecrect:alSecrect finish:finish];
+                [self showRating:appID alKey:alKey alSecrect:alSecrect isForeign:NO finish:finish];
             } else {
-                if (finish) {
-                    finish(NO);
-                }
-            }
-        } else {
-            [self requestIP:^(NSString *county) {
-                if (county && [county isEqualToString:@"中国"]) {
-                    [self showRating:appID alKey:alKey alSecrect:alSecrect finish:finish];
+                if (foreignShow) {
+                    [self showRating:appID alKey:alKey alSecrect:alSecrect isForeign:YES finish:finish];
                 } else {
                     if (finish) {
                         finish(NO);
                     }
                 }
+            }
+        } else {
+            [self requestIP:^(NSString *county) {
+                if (county && [county isEqualToString:@"中国"]) {
+                    [self showRating:appID alKey:alKey alSecrect:alSecrect isForeign:NO finish:finish];
+                } else {
+                    if (foreignShow) {
+                        [self showRating:appID alKey:alKey alSecrect:alSecrect isForeign:YES finish:finish];
+                    } else {
+                        if (finish) {
+                            finish(NO);
+                        }
+                    }
+                }
             }];
         }
     } else {//不判断IP
-        [self showRating:appID alKey:alKey alSecrect:alSecrect finish:finish];
+        [self showRating:appID alKey:alKey alSecrect:alSecrect isForeign:NO finish:finish];
     }
 }
 
 - (void)showRating:(NSString *)appID
              alKey:(NSString *)alKey
          alSecrect:(NSString *)alSecrect
+         isForeign:(BOOL)isForeign
             finish:(void (^)(BOOL))finish {
     NSDictionary *paramsDict = [FCXOnlineConfig fcxGetJSONConfigParams:@"ratingContent"];
     if (![paramsDict isKindOfClass:[NSDictionary class]]) {
@@ -130,17 +140,6 @@
     //    NSString *btn3 = [paramsDict objectForKey:@"按钮3"];
     NSInteger alertTimes = [[paramsDict objectForKey:@"总提醒次数"] integerValue];
     
-    if (rAction == 3) {//应用内好评
-        if([SKStoreReviewController respondsToSelector:@selector(requestReview)]) {
-            [SKStoreReviewController requestReview];
-            if (finish) {
-                finish(YES);
-            }
-            [FCXRating saveRating];
-            return;
-        }
-    }
-
     if (!title || !content || !btn1 || !btn2) {
         if (finish) {
             finish(NO);
@@ -165,6 +164,23 @@
         return;
     }
     
+    if (rAction == 3 || isForeign) {//应用内好评
+        if([SKStoreReviewController respondsToSelector:@selector(requestReview)]) {
+            [SKStoreReviewController requestReview];
+            if (finish) {
+                finish(YES);
+            }
+            [FCXRating saveRating];
+            return;
+        }
+    }
+    if (isForeign) {
+        if (finish) {
+            finish(NO);
+        }
+        return;
+    }
+
     MAlertViw *alertView = [[MAlertViw alloc] initWithTitle:title message:content delegate:nil cancelButtonTitle:nil otherButtonTitles:btn1, btn2, nil];
     alertView.dismiss = YES;
     [alertView show];

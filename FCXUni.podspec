@@ -35,9 +35,9 @@ Pod::Spec.new do |s|
 
   s.dependency "UMengAnalytics", "~> 4.2.4"
   s.dependency "AlicloudFeedback", "~> 3.2.0"
-  s.dependency "UMengUShare/Social/Sina", "~> 6.4.5"
-  s.dependency "UMengUShare/Social/WeChat", "~> 6.4.5"
-  s.dependency "UMengUShare/Social/QQ", "~> 6.4.5"
-  s.dependency "UMengUShare/Social/SMS", "~> 6.4.5"
+  s.dependency "UMengUShare/Social/Sina", "~> 6.4.6"
+  s.dependency "UMengUShare/Social/WeChat", "~> 6.4.6"
+  s.dependency "UMengUShare/Social/QQ", "~> 6.4.6"
+  s.dependency "UMengUShare/Social/SMS", "~> 6.4.6"
 
 end
